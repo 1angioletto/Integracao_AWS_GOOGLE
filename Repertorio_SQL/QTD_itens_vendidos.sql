@@ -4,3 +4,4 @@ select DEPTO
 
  from pm_web.pm_web_resultado
  group by DEPTO
+ order by Quantidade desc

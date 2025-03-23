@@ -1,0 +1,11 @@
+select ID
+      ,NOME
+      ,EMAIL
+      ,CASE 
+        WHEN RECEBE_EMAIL = 1.0 THEN 'Sim'
+        WHEN RECEBE_EMAIL = 0.0 THEN 'Não'
+          ELSE 'Desconhecido'
+            END AS RECEBE_EMAIL
+      ,Sum(quantidade) as QUANTIDADE_COMPRAS
+ from pm_web.pm_web_resultado
+ group by ID, NOME, EMAIL, RECEBE_EMAIL

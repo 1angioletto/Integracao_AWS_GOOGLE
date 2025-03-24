@@ -1,0 +1,30 @@
+WITH sub_consulta_ultima AS (
+    SELECT ID,
+           NOME,
+           EMAIL,
+           MAX(DT_PEDIDO) AS ultima_data
+    FROM pm_web.pm_web_resultado
+    GROUP BY ID, NOME, EMAIL
+),
+sub_consulta_penultima AS (
+    SELECT ID,
+           NOME,
+           EMAIL,
+           MAX(DT_PEDIDO) AS data_penultimo
+    FROM pm_web.pm_web_resultado t
+    WHERE DT_PEDIDO < (SELECT MAX(DT_PEDIDO)
+                        FROM pm_web.pm_web_resultado
+                        WHERE NOME = t.NOME AND EMAIL = t.EMAIL)
+    GROUP BY ID, NOME, EMAIL
+)
+SELECT u.NOME,
+       u.EMAIL,
+       u.ultima_data,
+       p.data_penultimo,
+       DATE_DIFF(PARSE_DATE('%d/%m/%Y', MAX(u.ultima_data)), PARSE_DATE('%d/%m/%Y', MAX(p.data_penultimo)), YEAR) AS anos_desde_ultimo_pedido
+FROM sub_consulta_ultima u
+LEFT JOIN sub_consulta_penultima p
+    ON u.NOME = p.NOME
+    AND u.EMAIL = p.EMAIL
+GROUP BY u.NOME, u.EMAIL, u.ultima_data, p.data_penultimo
+ORDER BY anos_desde_ultimo_pedido DESC;
